@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  mssql:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password123
+    ports:
+      - "1434:1433"
+    volumes:
+      - ./data:/var/opt/mssql/data
+
+  authservice.webapi:
+    container_name: authservice_webapi
+    image: ${DOCKER_REGISTRY-}authservicewebapi
+    build:
+      context: .
+      dockerfile: AuthService.WebAPI/Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - mssql
+
+networks:
+  mssql:
+    driver: bridge
